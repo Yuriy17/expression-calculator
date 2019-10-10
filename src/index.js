@@ -11,104 +11,124 @@ function expressionCalculator(expr) {
             '/': 2
         },
         brackets = {
-            '(': 0,
-            ')': 0
+            open: '(',
+            close: ')'
         },
         numbers = [],
-        pop_number=0;
+        pop_number = 0,
         number = '',
         operators = [],
         prev_operator = '',
         pop_operator = '',
         line_array = [],
         line = expr.replace(/\s/g, '');
-    for (let i; i < line.length; i++) {
+    for (let i = 0; i < line.length; i++) {
 
-        if (line[i] == '+' ||
+         if (line[i] == '+' ||
             line[i] == '-' ||
             line[i] == '*' ||
             line[i] == '/' ||
             line[i] == '(' ||
             line[i] == ')') {
-            if (!number.length) {
+            if (number.length) {
                 numbers.push(parseInt(number));
                 number = '';
             }
-            if (operators !== null) {
+            if (operators.length) {
                 prev_operator = operators[operators.length - 1];
                 if (line[i] == brackets.open) {
                     operators.push(line[i]);
 
                 } else if (line[i] == brackets.close) {
-                    while (prev_operator == brackets.open) {
-                        pop_operator = operators.pop();
-                        pop_number=numbers.pop();
-                        switch (pop_operator) {
-                            case '+':
-                                numbers[numbers.length-1]+=pop_number;
-                                break;
-                            case '-':
-                                numbers[numbers.length-1]-=pop_number;
-                                break;
-                            case '*':
-                                numbers[numbers.length-1]*=pop_number;
-                                if(prior[operators[operators.length - 1]]==1){
-                                    pop_number=numbers.pop();
-                                    if(operators[operators.length - 1]=='+'){
-                                        numbers[numbers.length-1]+=pop_number;
-                                    }else{
-                                        numbers[numbers.length-1]-=pop_number;
+                    if (operators.includes(brackets.open)) {
+                        while (prev_operator == brackets.open) {
+                            pop_operator = operators.pop();
+                            pop_number = numbers.pop();
+                            switch (pop_operator) {
+                                case '+':
+                                    numbers[numbers.length - 1] += pop_number;
+                                    break;
+                                case '-':
+                                    numbers[numbers.length - 1] -= pop_number;
+                                    break;
+                                case '*':
+                                    numbers[numbers.length - 1] *= pop_number;
+                                    if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] == 1) {
+                                        pop_number = numbers.pop();
+                                        if (operators[operators.length - 1] == '+') {
+                                            numbers[numbers.length - 1] += pop_number;
+                                            pop_operator = operators.pop();
+                                        } else {
+                                            numbers[numbers.length - 1] -= pop_number;
+                                            pop_operator = operators.pop();
+                                        }
                                     }
-                                }
-                                break;
-                            case '/':
-                                numbers[numbers.length-1]/=pop_number;
-                                if(prior[operators[operators.length - 1]]==1){
-                                    pop_number=numbers.pop();
-                                    if(operators[operators.length - 1]=='+'){
-                                        numbers[numbers.length-1]+=pop_number;
-                                    }else{
-                                        numbers[numbers.length-1]-=pop_number;
+                                    break;
+                                case '/':
+                                    if (pop_number) {
+                                        numbers[numbers.length - 1] /= pop_number;
+                                        if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] == 1) {
+                                            pop_number = numbers.pop();
+                                            if (operators[operators.length - 1] == '+') {
+                                                numbers[numbers.length - 1] += pop_number;
+                                                pop_operator = operators.pop();
+                                            } else {
+                                                numbers[numbers.length - 1] -= pop_number;
+                                                pop_operator = operators.pop();
+                                            }
+                                        }
+                                    } else {
+                                        throw new Error("TypeError: Division by zero.");
                                     }
-                                }
-                                break;
-                            default:
-                                break;
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
+                    } else {
+                        throw new Error("ExpressionError: Brackets must be paired");
                     }
 
-                } else if (prior[prev_operator] > prior[line[i]]) {
+                } else if (prior[prev_operator] < prior[line[i]]) {
                     operators.push(line[i]);
                 } else {
                     pop_operator = operators.pop();
-                    pop_number=numbers.pop();
+                    pop_number = numbers.pop();
                     switch (pop_operator) {
                         case '+':
-                            numbers[numbers.length-1]+=pop_number;
+                            numbers[numbers.length - 1] += pop_number;
                             break;
                         case '-':
-                            numbers[numbers.length-1]-=pop_number;
+                            numbers[numbers.length - 1] -= pop_number;
                             break;
                         case '*':
-                            numbers[numbers.length-1]*=pop_number;
-                            if(prior[operators[operators.length - 1]]==1){
-                                pop_number=numbers.pop();
-                                if(operators[operators.length - 1]=='+'){
-                                    numbers[numbers.length-1]+=pop_number;
-                                }else{
-                                    numbers[numbers.length-1]-=pop_number;
+                            numbers[numbers.length - 1] *= pop_number;
+                            if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] == 1) {
+                                pop_number = numbers.pop();
+                                if (operators[operators.length - 1] == '+') {
+                                    numbers[numbers.length - 1] += pop_number;
+                                    pop_operator = operators.pop();
+                                } else {
+                                    numbers[numbers.length - 1] -= pop_number;
+                                    pop_operator = operators.pop();
                                 }
                             }
                             break;
                         case '/':
-                            numbers[numbers.length-1]/=pop_number;
-                            if(prior[operators[operators.length - 1]]==1){
-                                pop_number=numbers.pop();
-                                if(operators[operators.length - 1]=='+'){
-                                    numbers[numbers.length-1]+=pop_number;
-                                }else{
-                                    numbers[numbers.length-1]-=pop_number;
+                            if (pop_number) {
+                                numbers[numbers.length - 1] /= pop_number;
+                                if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] == 1) {
+                                    pop_number = numbers.pop();
+                                    if (operators[operators.length - 1] == '+') {
+                                        numbers[numbers.length - 1] += pop_number;
+                                        pop_operator = operators.pop();
+                                    } else {
+                                        numbers[numbers.length - 1] -= pop_number;
+                                        pop_operator = operators.pop();
+                                    }
                                 }
+                            } else {
+                                throw new Error("TypeError: Division by zero.");
                             }
                             break;
                         default:
@@ -124,39 +144,49 @@ function expressionCalculator(expr) {
             number += line[i];
             if (i == line.length - 1) {
                 numbers.push(parseInt(number));
-                pop_operator = operators.pop();
-                pop_number=numbers.pop();
-                switch (pop_operator) {
-                    case '+':
-                        numbers[numbers.length-1]+=pop_number;
-                        break;
-                    case '-':
-                        numbers[numbers.length-1]-=pop_number;
-                        break;
-                    case '*':
-                        numbers[numbers.length-1]*=pop_number;
-                        if(prior[operators[operators.length - 1]]==1){
-                            pop_number=numbers.pop();
-                            if(operators[operators.length - 1]=='+'){
-                                numbers[numbers.length-1]+=pop_number;
-                            }else{
-                                numbers[numbers.length-1]-=pop_number;
+                while (numbers.length > 1) {
+                    pop_operator = operators.pop();
+                    pop_number = numbers.pop();
+                    switch (pop_operator) {
+                        case '+':
+                            numbers[numbers.length - 1] += pop_number;
+                            break;
+                        case '-':
+                            numbers[numbers.length - 1] -= pop_number;
+                            break;
+                        case '*':
+                            numbers[numbers.length - 1] *= pop_number;
+                            if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] == 1) {
+                                pop_number = numbers.pop();
+                                if (operators[operators.length - 1] == '+') {
+                                    numbers[numbers.length - 1] += pop_number;
+                                    pop_operator = operators.pop();
+                                } else {
+                                    numbers[numbers.length - 1] -= pop_number;
+                                    pop_operator = operators.pop();
+                                }
                             }
-                        }
-                        break;
-                    case '/':
-                        numbers[numbers.length-1]/=pop_number;
-                        if(prior[operators[operators.length - 1]]==1){
-                            pop_number=numbers.pop();
-                            if(operators[operators.length - 1]=='+'){
-                                numbers[numbers.length-1]+=pop_number;
-                            }else{
-                                numbers[numbers.length-1]-=pop_number;
+                            break;
+                        case '/':
+                            if (pop_number) {
+                                numbers[numbers.length - 1] /= pop_number;
+                                if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] == 1) {
+                                    pop_number = numbers.pop();
+                                    if (operators[operators.length - 1] == '+') {
+                                        numbers[numbers.length - 1] += pop_number;
+                                        pop_operator = operators.pop();
+                                    } else {
+                                        numbers[numbers.length - 1] -= pop_number;
+                                        pop_operator = operators.pop();
+                                    }
+                                }
+                                break;
+                            } else {
+                                throw new Error("TypeError: Division by zero.");
                             }
-                        }
-                        break;
-                    default:
-                        break;
+                            default:
+                                break;
+                    }
                 }
             }
         }

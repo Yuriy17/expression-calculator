@@ -126,12 +126,14 @@ describe("Easy", function() {
 describe("Medium", function() {
     it("Brackets must be paired", function() {
         const expr = "1 + 2) * 3";
-        expect(() => expressionCalculator(expr)).to.throw("ExpressionError: Brackets must be paired");
+        expect(() => 
+        expressionCalculator(expr)).to.throw("ExpressionError: Brackets must be paired");
     });
 
     it("Brackets must be paired", function() {
         const expr = "((1 + 2) * 3";
-        expect(() => expressionCalculator(expr)).to.throw("ExpressionError: Brackets must be paired");
+        expect(() => 
+        expressionCalculator(expr)).to.throw("ExpressionError: Brackets must be paired");
     });
 
     it("Brackets must be paired", function() {
