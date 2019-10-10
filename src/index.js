@@ -8,7 +8,9 @@ function expressionCalculator(expr) {
             '+': 1,
             '-': 1,
             '*': 2,
-            '/': 2
+            '/': 2,
+            '(': 0,
+            ')': 0
         },
         brackets = {
             open: '(',
@@ -19,12 +21,13 @@ function expressionCalculator(expr) {
         number = '',
         operators = [],
         prev_operator = '',
+        open_bracket=false,
         pop_operator = '',
-        line_array = [],
+
         line = expr.replace(/\s/g, '');
     for (let i = 0; i < line.length; i++) {
-
-         if (line[i] == '+' ||
+        open_bracket=false;
+        if (line[i] == '+' ||
             line[i] == '-' ||
             line[i] == '*' ||
             line[i] == '/' ||
@@ -37,12 +40,26 @@ function expressionCalculator(expr) {
             if (operators.length) {
                 prev_operator = operators[operators.length - 1];
                 if (line[i] == brackets.open) {
-                    operators.push(line[i]);
+                    if ((line.match(/\(/g) || []).length == (line.match(/\)/g) || []).length) {
+                        operators.push(line[i]);
+                    } else {
+                        throw new Error("ExpressionError: Brackets must be paired");
+                    }
 
                 } else if (line[i] == brackets.close) {
                     if (operators.includes(brackets.open)) {
-                        while (prev_operator == brackets.open) {
+                        while (!open_bracket && operators.length!==0) {
                             pop_operator = operators.pop();
+
+                            if (pop_operator === brackets.open) {
+                                
+                                if(i!==line.length-1){
+                                    open_bracket=true;
+                                    continue;
+                                }
+                                pop_operator = operators.pop();
+                                
+                            }
                             pop_number = numbers.pop();
                             switch (pop_operator) {
                                 case '+':
@@ -53,7 +70,7 @@ function expressionCalculator(expr) {
                                     break;
                                 case '*':
                                     numbers[numbers.length - 1] *= pop_number;
-                                    if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] == 1) {
+                                    if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] !== 2) {
                                         pop_number = numbers.pop();
                                         if (operators[operators.length - 1] == '+') {
                                             numbers[numbers.length - 1] += pop_number;
@@ -67,7 +84,7 @@ function expressionCalculator(expr) {
                                 case '/':
                                     if (pop_number) {
                                         numbers[numbers.length - 1] /= pop_number;
-                                        if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] == 1) {
+                                        if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] !== 2) {
                                             pop_number = numbers.pop();
                                             if (operators[operators.length - 1] == '+') {
                                                 numbers[numbers.length - 1] += pop_number;
@@ -85,6 +102,7 @@ function expressionCalculator(expr) {
                                     break;
                             }
                         }
+
                     } else {
                         throw new Error("ExpressionError: Brackets must be paired");
                     }
@@ -103,7 +121,7 @@ function expressionCalculator(expr) {
                             break;
                         case '*':
                             numbers[numbers.length - 1] *= pop_number;
-                            if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] == 1) {
+                            if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] !== 2) {
                                 pop_number = numbers.pop();
                                 if (operators[operators.length - 1] == '+') {
                                     numbers[numbers.length - 1] += pop_number;
@@ -117,7 +135,7 @@ function expressionCalculator(expr) {
                         case '/':
                             if (pop_number) {
                                 numbers[numbers.length - 1] /= pop_number;
-                                if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] == 1) {
+                                if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] !== 2) {
                                     pop_number = numbers.pop();
                                     if (operators[operators.length - 1] == '+') {
                                         numbers[numbers.length - 1] += pop_number;
@@ -156,7 +174,7 @@ function expressionCalculator(expr) {
                             break;
                         case '*':
                             numbers[numbers.length - 1] *= pop_number;
-                            if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] == 1) {
+                            if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] !== 2) {
                                 pop_number = numbers.pop();
                                 if (operators[operators.length - 1] == '+') {
                                     numbers[numbers.length - 1] += pop_number;
@@ -170,7 +188,7 @@ function expressionCalculator(expr) {
                         case '/':
                             if (pop_number) {
                                 numbers[numbers.length - 1] /= pop_number;
-                                if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] == 1) {
+                                if (prior[operators[operators.length - 1]] == 1 && prior[line[i]] !== 2) {
                                     pop_number = numbers.pop();
                                     if (operators[operators.length - 1] == '+') {
                                         numbers[numbers.length - 1] += pop_number;
